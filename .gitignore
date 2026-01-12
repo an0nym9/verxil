@@ -1,0 +1,5 @@
+# Ignores Rust build output folder
+/target
+
+# Ignore all lock files
+*.lock
