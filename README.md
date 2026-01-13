@@ -7,10 +7,13 @@ A simple **Version Control System (VCS)** built in **Rust**. This project is ins
 > [!NOTE]
 > This project is still under development and is **not production ready**.
 
-## Features (Planned)
+## Features
 
-Here are some of the planned features for **Verxil**.
+Here are some of the commands **Verxil** currently supports.
 
-* Initialize a repository (`verxil init`)
-* Stage files (`verxil add <file>`)
-* Commit changes (`verxil commit <message>`)
+> [!NOTE]
+> These commands are still work in progress and not fully implemented yet.
+
+* Initializing a repository (`init`)
+* Adding files (`add <file>`)
+* Commiting changes (`commit <message>`)
