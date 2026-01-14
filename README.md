@@ -17,3 +17,4 @@ Here are some of the commands **Verxil** currently supports.
 * Initializing a repository (`init`)
 * Adding files (`add <file>`)
 * Commiting changes (`commit <message>`)
+* Status check (`status`)
