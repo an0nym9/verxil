@@ -3,7 +3,7 @@ use std::fs;
 use std::path::Path;
 
 /// List all the files in the specified path dir
-fn list_files(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
+pub fn list_files(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let mut files = Vec::new();
     for entry in fs::read_dir(path)? {
         let entry = entry?;

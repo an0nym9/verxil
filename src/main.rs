@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::{collections::BTreeMap, env};
 mod commands;
-use commands::{add, commit, init};
+use commands::{add, commit, init, status};
 
 /// Entry point of the program
 fn main() -> Result<(), Box<dyn Error>> {
@@ -13,6 +13,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "init" => init::initialize_project().expect("Failed to initialize verxil."),
         "add" => add::add_object(arg).expect("Failed to add object."),
         "commit" => commit::commit_changes(arg).expect("Failed to commit."),
+        "status" => status::check_status()?,
         "help" => {
             let cmds = BTreeMap::from([
                 ("init", "initialize the repository, usage 'init'."),
@@ -21,6 +22,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     "commit",
                     "commit changes in files, usage 'commit <message>'.",
                 ),
+                ("status", "check the status of files."),
             ]);
             println!("Here are the commands this program currently supports");
             for (key, value) in cmds.iter().rev() {
