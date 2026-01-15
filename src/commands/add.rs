@@ -2,28 +2,58 @@ use std::error::Error;
 use std::fs;
 use std::path::Path;
 
-// Hash the given string
-fn hash(content: &str) -> String {
-    let bytes = content.as_bytes();
-    bytes.iter().map(|b| format!("{:02x}", b)).collect()
+/// Add file or dirs to stage
+pub fn add_object(path: &str) -> Result<(), Box<dyn Error>> {
+    let target = if path == "-A" || path == "-all" {
+        Path::new(".")
+    } else {
+        Path::new(path)
+    };
+
+    if !target.exists() {
+        return Err(format!("path '{}' does not exist", target.display()).into());
+    }
+
+    let staging = Path::new(".verxil/index");
+    fs::create_dir_all(staging)?;
+
+    if target.is_file() {
+        add_file(target, staging)?;
+    } else if target.is_dir() {
+        add_directory(target, staging)?;
+    }
+
+    Ok(())
 }
 
-/// Add a file to object dir
-pub fn add_object(path: &str) -> Result<(), Box<dyn Error>> {
-    let staging_path = Path::new(".verxil/index");
-    let file_path = Path::new(path);
-    if Path::exists(file_path) && Path::is_file(file_path) {
-        if !Path::exists(staging_path) {
-            println!("Cannot find verxil in project directory.");
-            return Ok(());
+/// Add directory to staging
+fn add_directory(dir: &Path, staging: &Path) -> Result<(), Box<dyn Error>> {
+    for entry in fs::read_dir(dir)? {
+        let entry = entry?;
+        let path = entry.path();
+
+        if path.is_dir() {
+            add_directory(&path, staging)?;
+        } else if path.is_file() {
+            add_file(&path, staging)?;
         }
-        if let Some(name) = file_path.file_name().and_then(|s| s.to_str()) {
-            fs::write(staging_path.join(hash(name)), fs::read_to_string(path)?)?;
-        } else {
-            println!("Failed to add file.");
-        }
-    } else {
-        println!("Path doesn't exists.");
     }
     Ok(())
+}
+
+/// Add file to staging
+fn add_file(path: &Path, staging: &Path) -> Result<(), Box<dyn Error>> {
+    let hash = hash_file(path)?;
+    let object_path = staging.join(hash);
+
+    fs::write(object_path, fs::read(path)?)?;
+    println!("added {}", path.display());
+
+    Ok(())
+}
+
+/// Hash file contents
+fn hash_file(path: &Path) -> Result<String, Box<dyn Error>> {
+    let bytes = fs::read(path)?;
+    Ok(bytes.iter().map(|b| format!("{:02x}", b)).collect())
 }

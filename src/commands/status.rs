@@ -1,25 +1,35 @@
 use std::error::Error;
+use std::path::Path;
 
 use crate::commands::commit::list_files;
 
+/// Check the current status of pre-commited and commited files
 pub fn check_status() -> Result<(), Box<dyn Error>> {
-    let staged_files = list_files(".verxil/index")?;
-    let commited_files = list_files(".verxil/objects")?;
-    println!("Staged files:");
-    if !staged_files.is_empty() {
-        for file in staged_files {
-            println!("\t- {}", file);
-        }
+    let staged_files = if Path::new(".verxil/index").exists() {
+        list_files(".verxil/index")?
     } else {
-        println!("\t- Empty")
-    }
-    println!("Commited files:");
-    if !commited_files.is_empty() {
-        for file in commited_files {
-            println!("\t- {}", file);
-        }
+        Vec::new()
+    };
+
+    let committed_files = if Path::new(".verxil/objects").exists() {
+        list_files(".verxil/objects")?
     } else {
-        println!("\t- Empty")
+        Vec::new()
+    };
+
+    fn print_files(title: &str, files: &[String]) {
+        println!("{}:", title);
+        if files.is_empty() {
+            println!("\t- Empty");
+        } else {
+            for file in files {
+                println!("\t- {}", file);
+            }
+        }
     }
+
+    print_files("Staged files", &staged_files);
+    print_files("Committed files", &committed_files);
+
     Ok(())
 }
