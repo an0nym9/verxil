@@ -1,6 +1,8 @@
 use std::env;
 use std::error::Error;
+
 mod commands;
+mod utils;
 use commands::{add, commit, init, status};
 
 enum Command<'a> {
@@ -32,7 +34,19 @@ fn print_help() {
         ("commit", "commit changes"),
         ("status", "check repository status"),
     ];
+    println!(
+        r" /$$    /$$                              /$$ /$$
+| $$   | $$                             |__/| $$
+| $$   | $$ /$$$$$$   /$$$$$$  /$$   /$$ /$$| $$
+|  $$ / $$//$$__  $$ /$$__  $$|  $$ /$$/| $$| $$
+ \  $$ $$/| $$$$$$$$| $$  \__/ \  $$$$/ | $$| $$
+  \  $$$/ | $$_____/| $$        >$$  $$ | $$| $$
+   \  $/  |  $$$$$$$| $$       /$$/\  $$| $$| $$
+    \_/    \_______/|__/      |__/  \__/|__/|__/
 
+Verxil a simple version control system inspired by Git.
+    "
+    );
     println!("Supported commands:");
     for (cmd, desc) in cmds {
         println!("  {:<8} {}", cmd, desc);
@@ -50,8 +64,12 @@ fn main() -> Result<(), Box<dyn Error>> {
         Command::Status => status::check_status()?,
         Command::Help => print_help(),
         Command::Unknown(cmd) => {
-            eprintln!("Unknown command: '{}'\n", cmd);
-            print_help();
+            if cmd != "version" {
+                eprintln!("Unknown command: '{}'\n", cmd);
+                print_help();
+            } else {
+                eprintln!("verxil v0.0.1");
+            }
         }
     }
 

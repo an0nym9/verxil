@@ -1,7 +1,7 @@
-use std::error::Error;
 use std::path::Path;
+use std::{error::Error, ops::Add};
 
-use crate::commands::commit::list_files;
+use crate::utils::{list_dirs, list_files};
 
 /// Check the current status of pre-commited and commited files
 pub fn check_status() -> Result<(), Box<dyn Error>> {
@@ -17,6 +17,12 @@ pub fn check_status() -> Result<(), Box<dyn Error>> {
         Vec::new()
     };
 
+    let commit_ready: Vec<_> = list_dirs(".")?
+        .into_iter()
+        .map(|d| d.add("/"))
+        .chain(list_files(".")?.into_iter())
+        .collect();
+
     fn print_files(title: &str, files: &[String]) {
         println!("{}:", title);
         if files.is_empty() {
@@ -30,6 +36,7 @@ pub fn check_status() -> Result<(), Box<dyn Error>> {
 
     print_files("Staged files", &staged_files);
     print_files("Committed files", &committed_files);
+    print_files("Unadded files", &commit_ready);
 
     Ok(())
 }
